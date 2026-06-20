@@ -1,0 +1,17 @@
+---
+- name: Show recent Hermes Agent logs
+  hosts: hermes
+  become: true
+  vars_files:
+    - ../group_vars/hermes.yml
+    - ../group_vars/hermes_vault.yml
+  tasks:
+    - name: Docker compose logs
+      ansible.builtin.command:
+        cmd: docker compose -f {{ hermes_app_dir }}/compose.yml logs --tail=100
+      register: hermes_logs
+      changed_when: false
+
+    - name: Print logs
+      ansible.builtin.debug:
+        var: hermes_logs.stdout_lines

@@ -1,0 +1,36 @@
+# OpenTofu / Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+terraform.tfvars.json
+*.tfplan
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ansible
+ansible/inventory/hosts.ini
+ansible/group_vars/*vault*.yml
+*.retry
+
+# Environment / secrets
+.env
+*.env
+secrets/
+id_*
+*.pem
+*.key
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+.venv/

@@ -1,0 +1,23 @@
+---
+- name: Allow SSH
+  community.general.ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+  when: hermes_enable_ufw | bool
+
+- name: Allow dashboard from LAN only when explicitly enabled
+  community.general.ufw:
+    rule: allow
+    port: "{{ hermes_dashboard_port }}"
+    proto: tcp
+    from_ip: "{{ hermes_lan_cidr }}"
+  when:
+    - hermes_enable_ufw | bool
+    - hermes_allow_dashboard_from_lan | bool
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+    policy: deny
+  when: hermes_enable_ufw | bool

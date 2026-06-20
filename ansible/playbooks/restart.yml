@@ -1,0 +1,12 @@
+---
+- name: Restart Hermes Agent stack
+  hosts: hermes
+  become: true
+  vars_files:
+    - ../group_vars/hermes.yml
+    - ../group_vars/hermes_vault.yml
+  tasks:
+    - name: Restart stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ hermes_app_dir }}"
+        state: restarted

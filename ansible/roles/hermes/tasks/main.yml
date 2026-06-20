@@ -1,0 +1,37 @@
+---
+- name: Clone Hermes Agent upstream source
+  ansible.builtin.git:
+    repo: "{{ hermes_repo_url }}"
+    dest: "{{ hermes_src_dir }}"
+    version: "{{ hermes_repo_version }}"
+    force: false
+  become_user: ubuntu
+
+- name: Template Hermes environment file
+  ansible.builtin.template:
+    src: hermes.env.j2
+    dest: "{{ hermes_app_dir }}/.env"
+    owner: ubuntu
+    group: ubuntu
+    mode: "0600"
+
+- name: Template Docker Compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ hermes_app_dir }}/compose.yml"
+    owner: ubuntu
+    group: ubuntu
+    mode: "0644"
+
+- name: Build Hermes Agent Docker image only if needed
+  community.docker.docker_compose_v2:
+    project_src: "{{ hermes_app_dir }}"
+    build: policy
+    pull: missing
+    state: present
+
+- name: Start Hermes Agent stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ hermes_app_dir }}"
+    state: present
+    recreate: auto

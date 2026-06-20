@@ -1,0 +1,25 @@
+---
+hermes_app_name: hermes-agent
+hermes_app_dir: /opt/hermes-agent
+hermes_src_dir: /opt/hermes-agent/src
+hermes_data_dir: /srv/hermes
+
+# Upstream source used to build the Docker image locally.
+hermes_repo_url: "https://github.com/NousResearch/hermes-agent.git"
+hermes_repo_version: "main"
+
+# Local Ollama on Blade 6.
+hermes_openai_base_url: "http://192.168.86.16:11434/v1"
+# hermes_default_model: "openai/qwen3:30b-a3b"
+hermes_default_model: "openai/tinyllama"
+
+# Leave dashboard localhost-only. Use SSH tunnel:
+# ssh -L 9119:127.0.0.1:9119 ubuntu@hermes-01
+# hermes_dashboard_host: "127.0.0.1"
+hermes_dashboard_host: "0.0.0.0"
+hermes_dashboard_port: 9119
+
+# UFW
+hermes_enable_ufw: true
+hermes_allow_dashboard_from_lan: true
+hermes_lan_cidr: "192.168.86.0/24"

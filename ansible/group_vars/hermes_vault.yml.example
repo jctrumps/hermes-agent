@@ -1,0 +1,7 @@
+---
+# Keep this file out of Git.
+# For local Ollama, this can be a placeholder because Ollama does not require a real key.
+hermes_openai_api_key: "ollama-local"
+
+# Optional. Required only if you later expose Hermes API server.
+hermes_api_server_key: "CHANGE_ME_LONG_RANDOM_VALUE"

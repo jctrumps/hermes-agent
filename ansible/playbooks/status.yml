@@ -1,0 +1,17 @@
+---
+- name: Show Hermes Agent status
+  hosts: hermes
+  become: true
+  vars_files:
+    - ../group_vars/hermes.yml
+    - ../group_vars/hermes_vault.yml
+  tasks:
+    - name: Docker compose ps
+      ansible.builtin.command:
+        cmd: docker compose -f {{ hermes_app_dir }}/compose.yml ps
+      register: hermes_ps
+      changed_when: false
+
+    - name: Print status
+      ansible.builtin.debug:
+        var: hermes_ps.stdout_lines

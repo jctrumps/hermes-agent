@@ -1,0 +1,33 @@
+---
+services:
+  gateway:
+    build:
+      context: {{ hermes_src_dir }}
+    image: local/hermes-agent:latest
+    container_name: hermes
+    restart: unless-stopped
+    network_mode: host
+    env_file:
+      - {{ hermes_app_dir }}/.env
+    volumes:
+      - {{ hermes_data_dir }}:/opt/data
+    environment:
+      - HERMES_UID=${HERMES_UID:-1000}
+      - HERMES_GID=${HERMES_GID:-1000}
+    command: ["gateway", "run"]
+
+  dashboard:
+    image: local/hermes-agent:latest
+    container_name: hermes-dashboard
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      - gateway
+    env_file:
+      - {{ hermes_app_dir }}/.env
+    volumes:
+      - {{ hermes_data_dir }}:/opt/data
+    environment:
+      - HERMES_UID=${HERMES_UID:-1000}
+      - HERMES_GID=${HERMES_GID:-1000}
+    command: ["dashboard", "--host", "{{ hermes_dashboard_host }}", "--port", "{{ hermes_dashboard_port }}", "--no-open", "--insecure"]

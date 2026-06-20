@@ -1,0 +1,12 @@
+---
+- name: Deploy Hermes Agent
+  hosts: hermes
+  become: true
+  vars_files:
+    - group_vars/hermes.yml
+    - group_vars/hermes_vault.yml
+  roles:
+    - base
+    - docker
+    - hermes
+    - firewall
