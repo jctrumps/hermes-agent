@@ -52,6 +52,10 @@ curl -fsS http://10.10.10.20:11434/v1/models | jq .
 
 ## Working notes
 
+- VM CPUs now default to 3 vCPUs in OpenTofu and its example, and the local `cpu_cores` setting was updated for heavier browser/tool testing. The live change still requires plan/apply and guest verification; it can be applied with the pending memory resize. See [Resize VM CPUs](runbook.md#resize-vm-cpus).
+
+- VM memory now defaults to 12 GiB (`12288` MiB) in OpenTofu and its example; the local memory setting was updated for testing heavier browser/tool workloads. The VM resize still requires an OpenTofu plan/apply and guest verification. See [Resize VM memory](runbook.md#resize-vm-memory).
+
 - The publication audit found that `ansible/group_vars/hermes.yml` is still Git-tracked despite the ignore rule. The initial commit also retains local network/site-specific data in configuration and docs. Stop tracking the local file and sanitize publication history before a public push; see [Public repository checklist](public-repo-checklist.md). The audit did not commit, push, untrack files, or rewrite history. GitHub visibility could not be verified with the unauthenticated local CLI.
 
 - Login protection is documented in [Login throttling and bot protection](login-protection.md): upstream Hermes's 10-attempt/60-second per-IP window, a separately configured Cloudflare 5-request/10-second login burst rule, optional bot detection, and auth audit/client-IP verification. The inspected behavior still needs verification on the deployed image; no Cloudflare security rule has been created by this repository.

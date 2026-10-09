@@ -32,6 +32,8 @@ Docs     -> deployment and operations notes
 | Repo | `hermes-agent` |
 | VM name | `hermes-01` |
 | OS | Ubuntu Server 24.04 LTS |
+| VM CPUs | 3 vCPUs |
+| VM memory | 12 GiB (`12288` MiB) |
 | Template | `ubuntu-2404-cloudinit` |
 | App path | `/opt/hermes-agent` |
 | Source path | `/opt/hermes-agent/src` |

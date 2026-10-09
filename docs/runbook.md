@@ -2,6 +2,66 @@
 
 If your local `hermes_vault.yml` is encrypted, add `--ask-vault-pass` to the playbook commands below. Use explicit commands instead of the Makefile helpers in that case. See [Dashboard hashes and Ansible Vault](dashboard-auth.md).
 
+## Resize VM memory
+
+Set the desired RAM in local `opentofu/terraform.tfvars`:
+
+```hcl
+memory_mb = 12288
+```
+
+This allocates 12 GiB (the provider's memory value is in MiB). For a later 10 GiB comparison, use `10240`. A local tfvars setting overrides the project's default, so keep it aligned with the size you want. This increases memory available for the controller, browser automation, and tools; hosted model inference remains external.
+
+From WSL/Linux:
+
+```bash
+cd /mnt/c/projects/hermes-agent/opentofu
+tofu fmt -check
+tofu validate
+tofu plan
+tofu apply
+```
+
+Inspect the plan for the expected VM memory change before applying. Changing RAM on this existing VM should be an in-place update; investigate if the plan proposes replacement or unrelated changes. If using a fresh Linux provider cache, run `tofu init` first. See [Deployment guide](deployment-guide.md) for the WSL/provider setup.
+
+On the Hermes VM after applying:
+
+```bash
+free -h
+docker stats --no-stream hermes hermes-dashboard
+```
+
+If the guest still sees the previous RAM allocation, shut down the VM and start it again from Proxmox so pending memory settings take effect. A guest-only reboot may not apply pending virtual hardware changes. Check `free -h` again; the displayed usable total will be slightly below the nominal allocation. Docker containers use the guest's available memory without an additional memory-limit change in this Compose stack.
+
+## Resize VM CPUs
+
+Set the desired vCPU count in local `opentofu/terraform.tfvars`:
+
+```hcl
+cpu_cores = 3
+```
+
+Three vCPUs gives browser automation and concurrent tools more scheduling capacity than the two-vCPU starting allocation. vCPUs share the host's processors; this setting does not reserve a physical core exclusively for the Proxmox host. Hosted-model inference remains external.
+
+Apply from the repository's `opentofu/` directory:
+
+```bash
+tofu fmt -check
+tofu validate
+tofu plan
+tofu apply
+```
+
+Expect an in-place CPU change. If the earlier memory increase is not yet applied, the same plan can include the 12 GiB memory allocation as well. Verify on the Hermes VM:
+
+```bash
+nproc
+free -h
+docker stats --no-stream hermes hermes-dashboard
+```
+
+`nproc` should report `3`. If the old CPU count remains, shut down and start the VM from Proxmox to apply pending hardware settings, then check again.
+
 ## Restart Hermes
 
 ```bash

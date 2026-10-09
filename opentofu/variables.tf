@@ -39,15 +39,15 @@ variable "template_vm_id" {
 }
 
 variable "cpu_cores" {
-  description = "Hermes does not run the model locally. 2 cores is enough to start."
+  description = "Hermes VM vCPU count. 2 is enough to start; 3 provides browser/tool headroom."
   type        = number
-  default     = 2
+  default     = 3
 }
 
 variable "memory_mb" {
-  description = "Hermes controller/UI memory. 4096 is minimum, 8192 preferred."
+  description = "Hermes controller/UI memory in MiB. 4096 is minimum; 12288 provides browser/tool headroom."
   type        = number
-  default     = 4096
+  default     = 12288
 }
 
 variable "disk_size_gb" {

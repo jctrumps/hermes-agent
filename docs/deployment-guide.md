@@ -23,10 +23,12 @@ Minimum:
 Preferred:
 
 ```text
-2-4 vCPU
-8 GB RAM
+3 vCPU
+12 GiB RAM (12288 MiB)
 60+ GB disk
 ```
+
+The OpenTofu defaults and example allocate 3 vCPUs and 12 GiB for browser automation and heavier tool use. An existing deployment uses the `cpu_cores` and `memory_mb` values in its local `opentofu/terraform.tfvars`; see [Resize VM CPUs](runbook.md#resize-vm-cpus) and [Resize VM memory](runbook.md#resize-vm-memory) to apply changes and verify them in the guest. Hosted-model inference still runs at the external provider.
 
 ## Pre-flight checks
 

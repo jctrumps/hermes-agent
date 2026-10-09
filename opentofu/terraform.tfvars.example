@@ -7,8 +7,8 @@ vm_id          = 2000
 vm_name        = "hermes-01"
 template_vm_id = 9024
 
-cpu_cores    = 2
-memory_mb    = 4096
+cpu_cores    = 3
+memory_mb    = 12288
 disk_size_gb = 40
 datastore_id = "local-lvm"
 bridge       = "vmbr0"
