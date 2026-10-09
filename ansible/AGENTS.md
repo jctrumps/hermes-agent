@@ -9,6 +9,7 @@ This directory configures the Hermes VM after OpenTofu creates it.
 - Do not commit `group_vars/hermes_vault.yml` or any rendered `.env` file.
 - Keep `hermes_dashboard_host` set to `127.0.0.1` unless authentication or a reverse proxy is added in the same change.
 - Keep Ollama external to this VM. Do not add an Ollama role or local model runtime here.
+- Keep public examples on `10.10.10.0/24`; do not commit real LAN addresses, hostnames, usernames, tokens, or secrets.
 - Keep roles small and layered: `base`, `docker`, `hermes`, then `firewall`.
 - Prefer idempotent Ansible modules over shell commands.
 - Use Ubuntu 24.04 assumptions unless the OpenTofu template changes.
@@ -18,7 +19,8 @@ This directory configures the Hermes VM after OpenTofu creates it.
 
 ## Variables
 
-- Put non-secret defaults in `group_vars/hermes.yml`.
+- Put public non-secret defaults in `group_vars/hermes.yml.example`.
+- Keep local runtime settings in ignored `group_vars/hermes.yml`.
 - Put secrets and API keys only in `group_vars/hermes_vault.yml.example` as placeholders.
 - If adding a required variable, document it in the example and relevant docs.
 

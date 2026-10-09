@@ -66,13 +66,13 @@ variable "bridge" {
 }
 
 variable "ipv4_address" {
-  description = "CIDR address, for example 192.168.86.52/24. Leave null if using DHCP."
+  description = "CIDR address, for example 10.10.10.50/24. Leave null if using DHCP."
   type        = string
   default     = null
 }
 
 variable "ipv4_gateway" {
-  description = "Gateway address, for example 192.168.86.1. Leave null if using DHCP."
+  description = "Gateway address, for example 10.10.10.1. Leave null if using DHCP."
   type        = string
   default     = null
 }

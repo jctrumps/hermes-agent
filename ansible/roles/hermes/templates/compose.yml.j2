@@ -25,9 +25,24 @@ services:
       - gateway
     env_file:
       - {{ hermes_app_dir }}/.env
+{% if hermes_dashboard_public_url | length > 0 %}
+      - {{ hermes_app_dir }}/dashboard.env
+{% endif %}
     volumes:
       - {{ hermes_data_dir }}:/opt/data
     environment:
       - HERMES_UID=${HERMES_UID:-1000}
       - HERMES_GID=${HERMES_GID:-1000}
-    command: ["dashboard", "--host", "{{ hermes_dashboard_host }}", "--port", "{{ hermes_dashboard_port }}", "--no-open", "--insecure"]
+    command: ["dashboard", "--host", "{{ hermes_dashboard_host }}", "--port", "{{ hermes_dashboard_port }}", "--no-open"]
+{% if hermes_cloudflare_tunnel_enabled | bool %}
+
+  cloudflared:
+    image: {{ hermes_cloudflared_image | to_json }}
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      - dashboard
+    env_file:
+      - {{ hermes_app_dir }}/cloudflared.env
+    command: ["tunnel", "--no-autoupdate", "run"]
+{% endif %}

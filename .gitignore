@@ -13,6 +13,7 @@ override.tf.json
 
 # Ansible
 ansible/inventory/hosts.ini
+ansible/group_vars/hermes.yml
 ansible/group_vars/*vault*.yml
 *.retry
 

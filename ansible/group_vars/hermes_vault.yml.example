@@ -1,7 +1,33 @@
 ---
-# Keep this file out of Git.
-# For local Ollama, this can be a placeholder because Ollama does not require a real key.
-hermes_openai_api_key: "ollama-local"
+# Copy to hermes_vault.yml and keep that local file out of Git.
+# Despite its name, the local file is plain YAML unless you encrypt it with Ansible Vault.
 
-# Optional. Required only if you later expose Hermes API server.
-hermes_api_server_key: "CHANGE_ME_LONG_RANDOM_VALUE"
+# Not needed for ChatGPT/Codex browser login or OpenCode Zen configured in Hermes.
+# Only uncomment for an OpenAI-compatible endpoint configured through Ansible.
+# For future local Ollama use: hermes_openai_api_key: "ollama-local"
+# hermes_openai_api_key: "CHANGE_ME_PROVIDER_API_KEY"
+
+# Not needed for dashboard or Cloudflare Tunnel access.
+# Used only if you separately enable Hermes's API server for external clients;
+# this Compose stack does not start that API server.
+# hermes_api_server_key: "CHANGE_ME_LONG_RANDOM_VALUE"
+
+# Required when hermes_dashboard_public_url is set. Replace BOTH placeholders.
+# Generate the hash from the repo root in WSL/Linux:
+# bash scripts/hash-dashboard-password.sh
+# Paste the complete scrypt$... output below; use single quotes.
+# Never put the actual dashboard password here. Remove any old hermes_dashboard_password.
+# See docs/dashboard-auth.md for hashing, encryption, and password changes.
+hermes_dashboard_password_hash: 'CHANGE_ME_SCRYPT_PASSWORD_HASH'
+# Session secret: an internal signing key, NOT another password you type to log in.
+# Run openssl rand -hex 32 in WSL/Linux and paste its output here. Keep it stable
+# across redeployments; changing it signs out existing dashboard sessions.
+hermes_dashboard_session_secret: "CHANGE_ME_RANDOM_SESSION_SECRET"
+
+# After setting the hash/secret, encrypt the local file from ansible/:
+# ANSIBLE_CONFIG="$PWD/ansible.cfg" ansible-vault encrypt group_vars/hermes_vault.yml
+# Add --ask-vault-pass to subsequent ansible-playbook commands.
+
+# Leave commented when you install/manage cloudflared manually.
+# Required ONLY if hermes_cloudflare_tunnel_enabled is true (Compose connector).
+# hermes_cloudflare_tunnel_token: "CHANGE_ME_CLOUDFLARE_TUNNEL_TOKEN"

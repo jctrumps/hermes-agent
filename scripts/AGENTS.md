@@ -7,7 +7,8 @@ This directory contains small operator helper scripts.
 ## Rules
 
 - Scripts should be safe wrappers around documented commands.
-- Do not embed secrets, tokens, private IPs beyond documented non-secret defaults, or private key paths.
+- Do not embed secrets, tokens, real private IPs, real hostnames, usernames, or private key paths.
+- Use `10.10.10.0/24` for documented example addresses.
 - Keep scripts POSIX-shell friendly with `#!/usr/bin/env bash` and `set -euo pipefail`.
 - Prefer environment variables for overrides and document them in the script or docs.
 - Do not add broad automation that hides OpenTofu or Ansible steps.

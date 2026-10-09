@@ -19,7 +19,8 @@ Docs     -> runbooks and notes
 
 - Do not commit secrets, API keys, `.env`, `terraform.tfvars`, or Ansible vault files.
 - Keep Hermes dashboard bound to localhost unless explicit authentication/reverse proxy work is added.
-- Keep Ollama on Blade 6 or another model host; do not run Ollama on the mini box for this project.
+- Keep Ollama on a separate model host; do not run Ollama on the mini box for this project.
+- Treat this as a public repository. Use `10.10.10.0/24` for example IP addresses and never document real local IPs, hostnames, usernames, tokens, or secrets.
 - Prefer simple, repeatable commands over clever automation.
 - Ubuntu 24.04 cloud-init template is the default.
 - When documenting WSL usage from `/mnt/c`, use explicit `ANSIBLE_CONFIG` and `-i inventory/hosts.ini` in Ansible commands.
@@ -37,6 +38,7 @@ Docs     -> runbooks and notes
 - `opentofu/terraform.tfvars` may contain a Proxmox API token.
 - `opentofu/.terraform/` is generated provider/cache content.
 - `ansible/group_vars/hermes_vault.yml` contains deployment secrets/placeholders.
+- `ansible/group_vars/hermes.yml` contains local deployment IP addresses and settings.
 - `ansible/inventory/hosts.ini` is generated for the local environment.
 
 Do not copy values from local-only files into examples, docs, tickets, or commits.

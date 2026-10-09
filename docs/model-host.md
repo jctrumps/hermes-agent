@@ -1,16 +1,16 @@
 # Model Host
 
-Hermes Agent uses an OpenAI-compatible API endpoint and points at Ollama on the model host.
+Use this guide only if you choose Ollama on a separate model host. For ChatGPT/Codex subscription login or OpenCode Zen, use [Hosted model providers](model-providers.md); no local model host is needed.
 
-Default endpoint:
+Example endpoint (enable it explicitly in local Ansible settings):
 
 ```text
-http://192.168.86.16:11434/v1
+http://10.10.10.20:11434/v1
 ```
 
 ## Expectations
 
-- Ollama runs on Blade 6 or another dedicated model host.
+- Ollama runs on a dedicated model host.
 - Ollama is not installed on the Hermes VM by this project.
 - Ollama stays LAN-only.
 - Firewall rules should limit port `11434` to trusted clients where practical.
@@ -18,7 +18,7 @@ http://192.168.86.16:11434/v1
 ## Check from the Hermes VM
 
 ```bash
-curl -fsS http://192.168.86.16:11434/v1/models | jq .
+curl -fsS http://10.10.10.20:11434/v1/models | jq .
 ```
 
 Or use the helper from a machine that can reach the model host:
@@ -45,12 +45,20 @@ Set:
 
 ```yaml
 hermes_openai_base_url: "http://<OLLAMA_HOST>:11434/v1"
+hermes_default_model: "openai/<OLLAMA_MODEL_NAME>"
+```
+
+In local `ansible/group_vars/hermes_vault.yml`, uncomment/set:
+
+```yaml
+hermes_openai_api_key: "ollama-local"
 ```
 
 Redeploy the app layer:
 
 ```bash
-make app
+cd ansible
+ANSIBLE_CONFIG="$PWD/ansible.cfg" ansible-playbook -i inventory/hosts.ini site.yml
 ```
 
 ## Firewall example on the Ollama host

@@ -16,12 +16,16 @@ Reviewed repository shape and defaults for the Hermes Agent homelab deployment.
 
 - `opentofu/terraform.tfvars` exists locally and may contain a Proxmox API token.
 - `opentofu/.terraform/` exists locally and is generated provider/cache content.
+- `ansible/group_vars/hermes.yml`, when created, contains local deployment network settings.
 - `ansible/group_vars/hermes_vault.yml`, when created, must stay local.
 - `ansible/inventory/hosts.ini` is generated and should not be treated as portable project source.
 
 ## Added safeguards
 
 - Added a `.gitignore` entry for the generated Ansible inventory.
+- Moved local Ansible settings to ignored `ansible/group_vars/hermes.yml` with public defaults in `hermes.yml.example`.
+- Standardized example IP addresses on `10.10.10.0/24`.
+- Added `docs/public-repo-checklist.md` for pre-publish review.
 - Added scoped `AGENTS.md` files so future agent work preserves project boundaries.
 - Added docs for architecture, operations, troubleshooting, backup/restore, and model-host expectations.
 

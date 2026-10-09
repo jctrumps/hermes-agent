@@ -25,9 +25,9 @@ hermes_dashboard_port: 9119
 # Domain access: use the FULL HTTPS URL, e.g. "https://hermes.example.com".
 # Keep empty only for SSH-tunnel/local-only access. No trailing slash.
 # See docs/cloudflare-tunnel.md.
-hermes_dashboard_public_url: "https://hermes.jctrumps.us"
+hermes_dashboard_public_url: ""
 # This is your Hermes dashboard login name, not your Linux or Cloudflare login.
-hermes_dashboard_username: "jctrumps"
+hermes_dashboard_username: "hermes-admin"
 # false = install/manage cloudflared separately (the default).
 # true = let this project's Compose stack run cloudflared; requires a vault token.
 # This flag controls the connector only; false still allows domain access.

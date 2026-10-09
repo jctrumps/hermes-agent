@@ -9,6 +9,7 @@ Use this as the short path for routine work.
 - Confirm the SSH public key in `terraform.tfvars` matches the private key path used by Ansible.
 - Confirm the target VM ID and static IP are unused.
 - Confirm Ollama is reachable from the target network.
+- Confirm local deployment files were copied from examples and are not tracked by Git.
 
 ## Provision
 
@@ -22,6 +23,7 @@ make infra-apply
 
 ```bash
 cd ansible
+cp group_vars/hermes.yml.example group_vars/hermes.yml
 cp group_vars/hermes_vault.yml.example group_vars/hermes_vault.yml
 ansible-galaxy collection install -r requirements.yml
 ANSIBLE_CONFIG="$PWD/ansible.cfg" ansible -i inventory/hosts.ini all -m ping
@@ -41,7 +43,7 @@ ANSIBLE_CONFIG="$PWD/ansible.cfg" ansible-playbook -i inventory/hosts.ini playbo
 From the Hermes VM:
 
 ```bash
-curl http://192.168.86.16:11434/v1/models
+curl http://10.10.10.20:11434/v1/models
 cd /opt/hermes-agent
 docker compose ps
 ```
@@ -56,6 +58,8 @@ Open `http://127.0.0.1:9119`.
 
 ## Routine update
 
+For the current hash-based domain deployment on an existing VM, use [Deploy the latest dashboard changes](deployment-guide.md#deploy-the-latest-dashboard-changes-to-an-existing-vm). Add `--ask-vault-pass` to the playbook commands below when your local Vault file is encrypted. Rebuild the Hermes image on the VM to pick up upstream auth/throttle changes; reapplying Ansible alone can reuse an existing image.
+
 ```bash
 cd ansible
 ANSIBLE_CONFIG="$PWD/ansible.cfg" ansible-playbook -i inventory/hosts.ini site.yml
@@ -64,6 +68,8 @@ ANSIBLE_CONFIG="$PWD/ansible.cfg" ansible-playbook -i inventory/hosts.ini playbo
 ```
 
 ## Before exposing anything
+
+For a same-VM Cloudflare Tunnel, keep the dashboard on localhost and follow [Login throttling and bot protection](login-protection.md) for login rate limiting and audit checks. Cloudflare Access remains optional.
 
 - Add authentication or a reverse proxy first.
 - Update `docs/security.md`.

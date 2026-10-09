@@ -1,0 +1,10 @@
+---
+hermes_openai_base_url: ""
+hermes_default_model: ""
+hermes_dashboard_public_url: ""
+hermes_dashboard_username: "hermes-admin"
+hermes_dashboard_password_hash: ""
+hermes_dashboard_session_secret: ""
+hermes_cloudflare_tunnel_enabled: false
+hermes_cloudflare_tunnel_token: ""
+hermes_cloudflared_image: "cloudflare/cloudflared:latest"

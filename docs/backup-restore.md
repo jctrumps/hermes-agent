@@ -9,7 +9,8 @@ Back up Hermes data and the local deployment inputs. Do not back up generated pr
 | `/srv/hermes` on the Hermes VM | Persistent Hermes data |
 | `opentofu/terraform.tfvars` on the operator workstation | Local Proxmox and VM settings |
 | `ansible/group_vars/hermes_vault.yml` on the operator workstation | Local secrets and API placeholders |
-| `ansible/group_vars/hermes.yml` in source control | Non-secret runtime defaults |
+| `ansible/group_vars/hermes.yml` on the operator workstation | Local non-secret runtime settings |
+| `ansible/group_vars/hermes.yml.example` in source control | Public example runtime settings |
 
 ## VM data backup
 
@@ -64,5 +65,8 @@ Then restore `/srv/hermes` if needed.
 
 - `opentofu/.terraform/`
 - `opentofu/*.tfstate*` unless you intentionally manage state backups securely
+- `ansible/group_vars/hermes.yml` outside trusted local backups
 - rendered `/opt/hermes-agent/.env` outside trusted secret storage
 - private SSH keys in ad hoc archives
+
+For public repository safety checks, see `docs/public-repo-checklist.md`.

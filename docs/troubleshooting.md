@@ -77,6 +77,7 @@ callback_result_format = yaml
 If the Hermes environment template fails because `hermes_openai_api_key` is undefined, either copy the vault example or rely on the local Ollama default in the template:
 
 ```bash
+cp ansible/group_vars/hermes.yml.example ansible/group_vars/hermes.yml
 cp ansible/group_vars/hermes_vault.yml.example ansible/group_vars/hermes_vault.yml
 ```
 
@@ -149,7 +150,7 @@ Then browse to `http://127.0.0.1:9119`.
 From the Hermes VM:
 
 ```bash
-curl -fsS http://192.168.86.16:11434/v1/models | jq .
+curl -fsS http://10.10.10.20:11434/v1/models | jq .
 ```
 
 If that fails, check these on the Ollama host:

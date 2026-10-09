@@ -10,7 +10,7 @@ operator laptop
       -> Docker Compose
       -> Hermes gateway
       -> Hermes dashboard on 127.0.0.1:9119
-      -> Ollama API on Blade 6
+      -> Ollama API on a separate model host
 ```
 
 ## Layers
@@ -36,7 +36,7 @@ operator laptop
 |---|---|---|
 | SSH | TCP `22` | Allowed by UFW |
 | Hermes dashboard | TCP `9119` bound to `127.0.0.1` | SSH tunnel only |
-| Ollama API | TCP `11434` on Blade 6 | LAN-only, ideally limited to trusted clients |
+| Ollama API | TCP `11434` on model host | LAN-only, ideally limited to trusted clients |
 
 ## Data flow
 

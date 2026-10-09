@@ -4,10 +4,10 @@
 
 Use the mini box or a small VM for Hermes Agent only.
 
-Use Blade 6 HX5 for Ollama and model inference.
+Use a separate model host for Ollama and model inference.
 
 ```text
-hermes-01 -> http://192.168.86.16:11434/v1 -> ollama-01 / Blade 6
+hermes-01 -> http://10.10.10.20:11434/v1 -> ollama-01
 ```
 
 ## VM sizing
@@ -30,13 +30,15 @@ Preferred:
 
 ## Pre-flight checks
 
-From the future Hermes VM, verify Ollama is reachable:
+For hosted models, follow [Hosted model providers](model-providers.md); no Ollama host is required. Provider overrides in the Ansible example now start empty so browser login and Hermes's provider selection can manage the model.
+
+If using Ollama, from the future Hermes VM verify it is reachable:
 
 ```bash
-curl http://192.168.86.16:11434/v1/models
+curl http://10.10.10.20:11434/v1/models
 ```
 
-If that fails, check Ollama bind address and firewall rules on Blade 6.
+If that fails, check Ollama bind address and firewall rules on the model host.
 
 ## Deployment order
 
@@ -53,6 +55,7 @@ Create these from examples and keep them out of Git:
 
 ```bash
 cp opentofu/terraform.tfvars.example opentofu/terraform.tfvars
+cp ansible/group_vars/hermes.yml.example ansible/group_vars/hermes.yml
 cp ansible/group_vars/hermes_vault.yml.example ansible/group_vars/hermes_vault.yml
 ```
 
@@ -104,3 +107,39 @@ ssh -L 9119:127.0.0.1:9119 ubuntu@hermes-01
 Then browse to `http://127.0.0.1:9119`.
 
 If `hermes-01` does not resolve from the workstation, use the VM IP address instead.
+
+## Optional domain hosting
+
+Follow [Cloudflare Tunnel hosting](cloudflare-tunnel.md) to publish an HTTPS hostname through a separately installed connector running on the Hermes VM. Set `hermes_dashboard_public_url` and dashboard credentials in local Ansible settings, leaving `hermes_cloudflare_tunnel_enabled: false`. A tunnel token is needed in Ansible only if you choose the optional Compose-managed connector. The dashboard remains on `127.0.0.1:9119`; Hermes's password login protects browser access and Cloudflare Access can be added later.
+
+Use [Dashboard hashes and Ansible Vault](dashboard-auth.md) to generate `hermes_dashboard_password_hash` and encrypt local secrets. Once encrypted, add `--ask-vault-pass` to playbook commands that load the Vault file, including syntax checks and operations playbooks.
+
+## Deploy the latest dashboard changes to an existing VM
+
+Use this path when the VM and inventory already exist. Preserve your local settings rather than copying `.example` files over them. Your local `hermes.yml` needs the full public HTTPS URL, dashboard username, localhost bind, and `hermes_cloudflare_tunnel_enabled: false` for a manually installed connector. Hosted-provider overrides should be empty when using the Hermes provider picker.
+
+Your local `hermes_vault.yml` must contain `hermes_dashboard_password_hash` and the session-signing secret, with the old plaintext `hermes_dashboard_password` removed. Follow [Dashboard hashes and Ansible Vault](dashboard-auth.md) if migration or encryption is not yet complete.
+
+From `ansible/` in WSL/Linux, for an encrypted Vault file:
+
+```bash
+ANSIBLE_CONFIG="$PWD/ansible.cfg" ansible-playbook -i inventory/hosts.ini --ask-vault-pass --syntax-check site.yml
+ANSIBLE_CONFIG="$PWD/ansible.cfg" ansible-playbook -i inventory/hosts.ini --ask-vault-pass site.yml
+```
+
+Enter the Vault passphrase at the prompt. For a local file that is still plaintext, omit `--ask-vault-pass`. The apply updates the source checkout and rendered configuration. The existing `build: policy` behavior can reuse the old image, so rebuild it on the Hermes VM:
+
+```bash
+cd /opt/hermes-agent
+docker compose build gateway
+docker compose up -d
+docker compose ps
+docker compose logs --tail=100 dashboard
+sudo systemctl status cloudflared --no-pager
+curl -I http://127.0.0.1:9119/login
+sudo ss -lntp 'sport = :9119'
+```
+
+An older image may refuse the new auth configuration until this rebuild completes. Rebuild/updating the image uses the shared data mount and does not require deleting it. Keep your manual `cloudflared` connector configured with `http://127.0.0.1:9119`; no Ansible tunnel token is needed.
+
+Open your public HTTPS URL in a private browser window, confirm a login is required, and use your dashboard username and actual password. Verify a dashboard page and chat session. Check the auth audit log and add the separately configured Cloudflare login rate limit using [Login throttling and bot protection](login-protection.md). The guide also covers client-IP forwarding and optional Bot Fight Mode; Access remains optional.

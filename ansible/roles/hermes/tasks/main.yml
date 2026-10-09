@@ -1,4 +1,41 @@
 ---
+- name: Validate public dashboard URL
+  ansible.builtin.assert:
+    that:
+      - hermes_dashboard_public_url is match('^https://[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?$')
+      - hermes_dashboard_username | trim | length > 0
+    fail_msg: "Set an HTTPS dashboard URL with no path or trailing slash and a dashboard username."
+  when: hermes_dashboard_public_url | length > 0
+
+- name: Validate public dashboard credentials
+  ansible.builtin.assert:
+    that:
+      - hermes_dashboard_password_hash is match('^scrypt[$]16384[$]8[$]1[$][A-Za-z0-9+/]{22}==[$][A-Za-z0-9+/]{43}=$')
+      - hermes_dashboard_password | default('') | length == 0
+      - hermes_dashboard_session_secret | length >= 32
+      - not hermes_dashboard_session_secret.startswith('CHANGE_ME')
+    fail_msg: "Set a Hermes-compatible scrypt password hash and random session secret in hermes_vault.yml; remove the legacy hermes_dashboard_password variable. See docs/dashboard-auth.md."
+  no_log: true
+  when: hermes_dashboard_public_url | length > 0
+
+- name: Validate same-VM Cloudflare Tunnel settings
+  ansible.builtin.assert:
+    that:
+      - hermes_dashboard_public_url | length > 0
+      - hermes_dashboard_host == '127.0.0.1'
+      - not (hermes_allow_dashboard_from_lan | bool)
+    fail_msg: "Cloudflare Tunnel requires a public URL, dashboard host 127.0.0.1, and LAN dashboard access disabled."
+  when: hermes_cloudflare_tunnel_enabled | bool
+
+- name: Validate Cloudflare Tunnel token
+  ansible.builtin.assert:
+    that:
+      - hermes_cloudflare_tunnel_token | trim | length > 0
+      - not hermes_cloudflare_tunnel_token.startswith('CHANGE_ME')
+    fail_msg: "Set hermes_cloudflare_tunnel_token in hermes_vault.yml."
+  no_log: true
+  when: hermes_cloudflare_tunnel_enabled | bool
+
 - name: Clone Hermes Agent upstream source
   ansible.builtin.git:
     repo: "{{ hermes_repo_url }}"
@@ -15,6 +52,26 @@
     group: ubuntu
     mode: "0600"
 
+- name: Template authenticated dashboard environment file
+  ansible.builtin.template:
+    src: dashboard.env.j2
+    dest: "{{ hermes_app_dir }}/dashboard.env"
+    owner: ubuntu
+    group: ubuntu
+    mode: "0600"
+  no_log: true
+  when: hermes_dashboard_public_url | length > 0
+
+- name: Template Cloudflare Tunnel environment file
+  ansible.builtin.template:
+    src: cloudflared.env.j2
+    dest: "{{ hermes_app_dir }}/cloudflared.env"
+    owner: ubuntu
+    group: ubuntu
+    mode: "0600"
+  no_log: true
+  when: hermes_cloudflare_tunnel_enabled | bool
+
 - name: Template Docker Compose file
   ansible.builtin.template:
     src: compose.yml.j2
@@ -29,9 +86,23 @@
     build: policy
     pull: missing
     state: present
+    remove_orphans: true
 
 - name: Start Hermes Agent stack
   community.docker.docker_compose_v2:
     project_src: "{{ hermes_app_dir }}"
     state: present
     recreate: auto
+    remove_orphans: true
+
+- name: Remove disabled Cloudflare Tunnel environment file
+  ansible.builtin.file:
+    path: "{{ hermes_app_dir }}/cloudflared.env"
+    state: absent
+  when: not (hermes_cloudflare_tunnel_enabled | bool)
+
+- name: Remove unused dashboard environment file
+  ansible.builtin.file:
+    path: "{{ hermes_app_dir }}/dashboard.env"
+    state: absent
+  when: hermes_dashboard_public_url | length == 0
